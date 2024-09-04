@@ -49,7 +49,7 @@ fun CourseCard(course: Course) {
             .shadow(
                 elevation = 4.dp,
                 shape = RoundedCornerShape(25.dp),
-                spotColor = Color.Black.copy(alpha = 0.25f)
+                spotColor = Color.Black.copy(alpha = 0.8f)
             ),
         shape = RoundedCornerShape(25.dp)
     ) {
@@ -118,6 +118,11 @@ fun CourseCard(course: Course) {
                     .align(Alignment.TopEnd)
                     .offset(x = (-8).dp, y = 8.dp)
                     .clip(CircleShape)
+                    .shadow(
+                        elevation = 4.dp,
+                        shape = RoundedCornerShape(25.dp),
+                        spotColor = Color.Black.copy(alpha = 0.8f)
+                    ),
             )
         }
     }
