@@ -24,7 +24,7 @@ fun HomeScreen(navController: NavController) {
     ) {
         item {
             WelcomeSection()
-            AnalyticsSection()
+            AnalyticsSection(navController)
         }
         item {
             Text(

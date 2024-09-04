@@ -1,6 +1,7 @@
 package com.example.educhat.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,13 +19,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.aay.compose.barChart.BarChart
 import com.aay.compose.barChart.model.BarParameters
 import com.aay.compose.baseComponents.model.LegendPosition
 import com.example.educhat.R
 
 @Composable
-fun AnalyticsSection() {
+fun AnalyticsSection(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -51,7 +53,7 @@ fun AnalyticsSection() {
                     fontSize = 20.sp
                 )
             )
-            ActivityChart()
+            ActivityChart(navController)
         }
         Image(
             painter = painterResource(id = R.drawable.more_button),
@@ -65,13 +67,14 @@ fun AnalyticsSection() {
                     elevation = 4.dp,
                     shape = RoundedCornerShape(25.dp),
                     spotColor = Color.Black.copy(alpha = 0.8f)
-                ),
+                )
+                .clickable { navController.navigate("analytics") },
         )
     }
 }
 
 @Composable
-fun ActivityChart() {
+fun ActivityChart(navController: NavController) {
     val testBarParameters: List<BarParameters> = listOf(
         BarParameters(
             dataName = "Completed",
@@ -80,7 +83,10 @@ fun ActivityChart() {
         ),
     )
 
-    Box(Modifier.fillMaxSize()) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .clickable { navController.navigate("analytics") }) {
         BarChart(
             chartParameters = testBarParameters,
             gridColor = Color.DarkGray,
