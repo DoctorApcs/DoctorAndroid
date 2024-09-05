@@ -21,13 +21,15 @@ fun MyApp(modifier: Modifier = Modifier) {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "home",
+            startDestination = "chat",
             modifier = Modifier.padding(innerPadding)
         ) {
             // A composable that is used to navigate to all the screens
             // Here I called the AnalyticsScreen in the "home" router for simplicity, it should be called in the "analytics" router
             composable("home") { HomeScreen(navController = navController) }
             composable("analytics") { AnalyticsScreen(navController = navController) }
+            composable("chat") { ChatScreen() }
+
         }
     }
 }
