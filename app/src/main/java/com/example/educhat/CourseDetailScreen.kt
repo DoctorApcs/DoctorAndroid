@@ -1,5 +1,9 @@
 package com.example.educhat
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -32,7 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
-
+import androidx.compose.ui.window.Dialog
 @Composable
 fun CourseDetailsScreen(navController: NavHostController, courseId: String, courses: List<Course>) {
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -132,26 +136,42 @@ fun DashboardContent(course: Course) {
 
 @Composable
 fun UploadsContent() {
+    val context = LocalContext.current
+    var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
+    var embedLink by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+    val uploadHistory = remember { mutableStateListOf<UploadHistoryItem>() }
+
+    // File picker launcher
+    val filePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            selectedFileUri = it
+            // Add the file to history
+            uploadHistory.add(UploadHistoryItem(UploadType.FILE, it.toString(), System.currentTimeMillis()))
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(top = 16.dp)
     ) {
-        // Recent uploads section
-        Text(text = "Recent upload", style = MaterialTheme.typography.bodyLarge, color = Color.Black)
+        // Show recent uploads section
+        Text(text = "Recent Uploads", style = MaterialTheme.typography.bodyLarge, color = Color.Black)
         Spacer(modifier = Modifier.height(8.dp))
-        // Upload items
-        UploadItem(platform = "YouTube", link = "link", iconId = R.drawable.ic_youtube)
-        Spacer(modifier = Modifier.height(8.dp))
-        UploadItem(platform = "Google Drive", link = "link", iconId = R.drawable.ic_google_drive)
-        Spacer(modifier = Modifier.height(8.dp))
-        UploadItem(platform = "File", link = "link", iconId = R.drawable.ic_file)
+
+        // Show history of uploads (sorted by time)
+        val sortedHistory = uploadHistory.sortedByDescending { it.timestamp }
+        sortedHistory.forEach { item ->
+            UploadHistoryItemCard(item)
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // FloatingActionButton to upload or embed a link
         FloatingActionButton(
-            onClick = { /* Handle upload action */ },
+            onClick = { showDialog = true }, // Show dialog to choose between file upload or link embed
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 16.dp),
@@ -159,11 +179,27 @@ fun UploadsContent() {
         ) {
             Icon(painter = painterResource(id = R.drawable.ic_upload), contentDescription = "Upload")
         }
+
+        // Show dialog for file upload or link embed
+        if (showDialog) {
+            ActionDialog(
+                onFileUpload = {
+                    showDialog = false
+                    filePickerLauncher.launch("*/*") // Launch file picker for any file type
+                },
+                onEmbedLink = {
+                    showDialog = false
+                    embedLink = "https://youtube.com" // You can prompt for link input here
+                    // Add the link to history
+                    uploadHistory.add(UploadHistoryItem(UploadType.LINK, embedLink, System.currentTimeMillis()))
+                }
+            )
+        }
     }
 }
 
 @Composable
-fun UploadItem(platform: String, link: String, iconId: Int) {
+fun UploadHistoryItemCard(item: UploadHistoryItem) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -177,15 +213,65 @@ fun UploadItem(platform: String, link: String, iconId: Int) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val iconId = when (item.type) {
+                UploadType.FILE -> R.drawable.ic_file
+                UploadType.LINK -> R.drawable.ic_link
+            }
             Image(
-                painter = painterResource(id = iconId), // Use the provided icon resource
-                contentDescription = "$platform Icon",
+                painter = painterResource(id = iconId),
+                contentDescription = "Upload Item Icon",
                 modifier = Modifier.size(40.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
+
             Column {
-                Text(text = platform, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                Text(text = link, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                Text(text = if (item.type == UploadType.FILE) "File" else "Link", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                Text(text = item.uri, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                Text(text = "Uploaded at ${item.timestamp.toFormattedTime()}", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+            }
+        }
+    }
+}
+
+// Utility to format timestamp into a readable date and time string
+fun Long.toFormattedTime(): String {
+    val sdf = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss", java.util.Locale.getDefault())
+    return sdf.format(java.util.Date(this))
+}
+
+@Composable
+fun ActionDialog(onFileUpload: () -> Unit, onEmbedLink: () -> Unit) {
+    Dialog(onDismissRequest = { /* Handle dismiss */ }) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .background(Color.White)
+                    .padding(16.dp)
+            ) {
+                Text(text = "Choose Action", style = MaterialTheme.typography.bodyLarge, color = Color.Black)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = onFileUpload,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Upload File")
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    onClick = onEmbedLink,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Embed Link")
+                }
             }
         }
     }

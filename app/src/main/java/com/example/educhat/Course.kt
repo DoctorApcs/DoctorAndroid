@@ -14,3 +14,14 @@ data class Course(
     val pieChartData: List<PieChartData>,
     val progressPercentage: Int // Progress percentage (0 to 100)
 )
+
+data class UploadHistoryItem(
+    val type: UploadType,  // Either FILE or LINK
+    val uri: String,       // The URI of the file or link
+    val timestamp: Long    // Time when the item was added
+)
+
+enum class UploadType {
+    FILE,
+    LINK
+}
