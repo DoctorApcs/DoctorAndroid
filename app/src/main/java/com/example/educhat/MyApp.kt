@@ -28,6 +28,7 @@ fun MyApp(modifier: Modifier = Modifier) {
             // Here I called the AnalyticsScreen in the "home" router for simplicity, it should be called in the "analytics" router
             composable("home") { HomeScreen(navController = navController) }
             composable("analytics") { AnalyticsScreen(navController = navController) }
+            composable("welcome") { WelcomeBackScreen(navController = navController) }
         }
     }
 }
