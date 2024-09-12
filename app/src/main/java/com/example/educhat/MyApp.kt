@@ -82,7 +82,7 @@ fun MyApp(modifier: Modifier = Modifier) {
             composable("home") { HomeScreen(navController = navController) }
             composable("analytics") { AnalyticsScreen(navController = navController) }
             composable("welcome") { WelcomeBackScreen(navController = navController) }
-            composable("chat") { ChatScreen() }
+            composable("chat") { ChatScreen(navController = navController) }
             composable("courses") { CourseScreen(navController, courses) }
             composable("course_detail/{courseId}") { backStackEntry ->
                 val courseId = backStackEntry.arguments?.getString("courseId")
