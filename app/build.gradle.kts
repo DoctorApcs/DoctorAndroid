@@ -61,7 +61,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
-    implementation("io.github.thechance101:chart:Beta-0.0.5")
+    implementation(libs.chart)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,7 +69,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
-    implementation("androidx.navigation:navigation-compose:2.7.1")
+    implementation(libs.mpandroidchart)
+    implementation(libs.androidx.navigation.compose.v271)
     implementation(libs.androidx.material3)
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
+
 //@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CourseScreen(navController: NavHostController, courses: List<Course>) {
