@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,6 +28,19 @@ import com.aay.compose.barChart.model.BarParameters
 import com.aay.compose.donutChart.PieChart
 import com.aay.compose.donutChart.model.PieChartData
 
+class LearningData(
+    val courseName: String,
+    val data: List<Double>,
+    val color: Color
+)
+
+val learningData: List<LearningData> = listOf(
+    LearningData("CS305", listOf(1.0, 2.0, 2.4, 1.2, 2.3, 3.0, 0.5), Color(0xFF6C3428)),
+    LearningData("Mobile", listOf(0.5, 0.1, 0.2, 1.0, 2.0, 1.0, 0.4), Color(0xFFBA704F)),
+    LearningData("Calculus 3", listOf(0.1, 2.1, 2.3, 1.0, 3.0, 2.0, 1.4), Color(0xFFDFA878)),
+)
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnalyticsScreen(navController: NavController) {
@@ -35,7 +50,7 @@ fun AnalyticsScreen(navController: NavController) {
                 title = {
                     Text(
                         text = "Analytics",
-                        fontSize = 20.sp,
+                        fontSize = 30.sp,
                         color = Color.Black
                     )
                 },
@@ -43,53 +58,49 @@ fun AnalyticsScreen(navController: NavController) {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.return_icon), // Replace with your drawable resource ID
-                            contentDescription = "Return"
+                            contentDescription = "Return",
+                            modifier = Modifier.size(30.dp)
                         )
                     }
                 }
             )
         }
     ) { paddingValues ->
-        LazyColumn( // Changed to LazyColumn for scrollable content
+        LazyColumn(
             modifier = Modifier
-                .fillMaxSize() // Use fillMaxSize to allow the LazyColumn to take full height
+                .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
             item {
-                BarChartSample()
+                BarChartSample(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp) // Set a specific height
+                )
             }
             item {
-                PieChartSample()
+                PieChartSample(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp) // Set a specific height
+                )
             }
         }
     }
 }
 
-
-
-// Bar Chart docs: https://github.com/TheChance101/AAY-chart?tab=readme-ov-file
 @Composable
-fun BarChartSample() {
-    val testBarParameters: List<BarParameters> = listOf(
+fun BarChartSample(modifier: Modifier = Modifier) {
+    val testBarParameters = learningData.map { learningData ->
         BarParameters(
-            dataName = "CS305",
-            data = listOf(1.0, 2.0, 2.4, 1.2, 2.3, 3.0, 0.5),
-            barColor = Color(0xFF6C3428)
-        ),
-        BarParameters(
-            dataName = "Mobile",
-            data = listOf(0.5, 0.1, 0.2, 1.0, 2.0, 1.0, 0.4),
-            barColor = Color(0xFFBA704F),
-        ),
-        BarParameters(
-            dataName = "Calculus 3",
-            data = listOf(0.1, 2.1, 2.3, 1.0, 3.0, 2.0, 1.4),
-            barColor = Color(0xFFDFA878),
-        ),
-    )
+            dataName = learningData.courseName,
+            data = learningData.data,
+            barColor = learningData.color
+        )
+    }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(modifier = modifier) {
         BarChart(
             chartParameters = testBarParameters,
             gridColor = Color.DarkGray,
@@ -113,33 +124,17 @@ fun BarChartSample() {
 }
 
 @Composable
-fun PieChartSample() {
-
-    val testPieChartData: List<PieChartData> = listOf(
+fun PieChartSample(modifier: Modifier = Modifier) {
+    val testPieChartData = learningData.map { learningData ->
         PieChartData(
-            partName = "part A",
-            data = 500.0,
-            color = Color(0xFF22A699),
-        ),
-        PieChartData(
-            partName = "Part B",
-            data = 700.0,
-            color = Color(0xFFF2BE22),
-        ),
-        PieChartData(
-            partName = "Part C",
-            data = 500.0,
-            color = Color(0xFFF29727),
-        ),
-        PieChartData(
-            partName = "Part D",
-            data = 100.0,
-            color = Color(0xFFF24C3D),
-        ),
-    )
+            partName = learningData.courseName,
+            data = learningData.data.sum(),
+            color = learningData.color
+        )
+    }
 
     PieChart(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         pieChartData = testPieChartData,
         ratioLineColor = Color.LightGray,
         textRatioStyle = TextStyle(color = Color.Gray),
