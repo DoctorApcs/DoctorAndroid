@@ -1,5 +1,6 @@
 package com.example.educhat
 import android.net.wifi.hotspot2.pps.HomeSp
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -16,6 +17,7 @@ import com.example.educhat.ui.components.AnalyticsSection
 import com.example.educhat.ui.components.HomeActivityList
 import com.example.educhat.ui.components.HomeCourseList
 import com.example.educhat.ui.components.WelcomeSection
+import com.example.educhat.ui.theme.CustomPrimaryStart
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -27,15 +29,35 @@ fun HomeScreen(navController: NavController) {
             AnalyticsSection(navController)
         }
         item {
-            Text(
-                "Your Courses",
-                style = TextStyle(
-                    fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 25.sp
-                ),
-                modifier = Modifier.padding(vertical = 16.dp)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "Your Courses",
+                    style = TextStyle(
+                        fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 25.sp
+                    ),
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+                Text(
+                    "See all",
+                    style = TextStyle(
+                        fontFamily = FontFamily(Font(R.font.montserrat_regular)),
+                        color = CustomPrimaryStart,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    ),
+                    modifier = Modifier
+                        .padding(vertical = 16.dp)
+                        .clickable {
+                            // Navigate to the course screen
+                            navController.navigate("courses")
+                        }
+                )
+            }
         }
         item { HomeCourseList() }
         item {
