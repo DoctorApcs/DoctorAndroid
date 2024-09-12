@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.educhat.ui.components.AnalyticsSection
-import com.example.educhat.ui.components.HomeActivityList
-import com.example.educhat.ui.components.HomeCourseList
+import com.example.educhat.ui.components.home.HomeActivityList
+import com.example.educhat.ui.components.home.HomeCourseList
 import com.example.educhat.ui.components.WelcomeSection
 import com.example.educhat.ui.theme.CustomPrimaryStart
 

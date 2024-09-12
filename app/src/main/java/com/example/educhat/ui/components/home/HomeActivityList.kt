@@ -1,4 +1,4 @@
-package com.example.educhat.ui.components
+package com.example.educhat.ui.components.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
