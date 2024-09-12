@@ -2,6 +2,7 @@ package com.example.educhat.ui.components.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,13 +35,14 @@ import com.example.educhat.R
 import com.example.educhat.ui.theme.CustomPrimaryStart
 
 @Composable
-fun AddCourseCard() {
+fun AddCourseCard(onAddNewCourse: () -> Unit) {
     Box(
         modifier = Modifier
             .width(180.dp)
             .height(180.dp)
             .background(Color.Transparent, RoundedCornerShape(25.dp))
-            .dashedBorder(CustomPrimaryStart, 4.dp, 25.dp, 8.dp, 8.dp),
+            .dashedBorder(CustomPrimaryStart, 4.dp, 25.dp, 8.dp, 8.dp)
+            .clickable { onAddNewCourse() },
         contentAlignment = Alignment.Center
     ) {
         Icon(

@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.Dp
 data class Course(val name: String, val imageRes: Int, val docCount: Int)
 
 @Composable
-fun HomeCourseList() {
+fun HomeCourseList(onAddNewCourse: () -> Unit) {
     val courses = listOf(
         Course("Calculus 3", R.drawable.calculus_bg, 2),
         Course("CS305", R.drawable.cs_bg, 10),
@@ -28,7 +28,7 @@ fun HomeCourseList() {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
     ) {
-        item{ AddCourseCard() }
+        item{ AddCourseCard(onAddNewCourse) }
 
         items(courses) { course ->
             CourseCard(course)
