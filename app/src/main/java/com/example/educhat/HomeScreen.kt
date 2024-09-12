@@ -1,5 +1,4 @@
 package com.example.educhat
-import android.net.wifi.hotspot2.pps.HomeSp
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -71,6 +70,6 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.padding(vertical = 16.dp)
             )
         }
-        item { HomeActivityList() }
+        item { HomeActivityList { navController.navigate("chat") } }
     }
 }

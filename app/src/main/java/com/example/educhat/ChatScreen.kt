@@ -2,6 +2,7 @@ package com.example.educhat
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,9 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.educhat.R
 import kotlinx.coroutines.launch
 
@@ -28,7 +32,7 @@ data class Message(
 )
 
 @Composable
-fun ChatScreen() {
+fun ChatScreen(navController: NavController) {
     val messages = remember {
         mutableStateListOf(
             Message("Hello! John abraham", true, "09:25 AM"),
@@ -36,9 +40,6 @@ fun ChatScreen() {
             Message("You did your job well!", true, "09:27 AM"),
             Message("Have a great working week!!", false, "09:28 AM"),
             Message("Hope you like it", false, "09:28 AM"),
-            Message("Have a great working week!!", false, "09:28 AM"),
-            Message("Have a great working week!!", false, "09:28 AM"),
-            Message("Have a great working week!!", false, "09:28 AM"),
 
         )
     }
@@ -52,7 +53,7 @@ fun ChatScreen() {
             .fillMaxSize()
             .background(Color.White)
     ) {
-        ChatHeader()
+        ChatHeader(navController)
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -92,7 +93,7 @@ fun ChatScreen() {
 }
 
 @Composable
-fun ChatHeader() {
+fun ChatHeader(navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -104,16 +105,19 @@ fun ChatHeader() {
             painter = painterResource(id = R.drawable.return_icon),
             contentDescription = "Return Icon",
             modifier = Modifier.size(34.dp)
+                .clickable { navController.popBackStack() }
         )
         Spacer(modifier = Modifier.width(20.dp))
         Column {
             Text(
                 text = "Calculus 3",
+                fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
                 fontSize = 30.sp,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
                 text = "Final review",
+                fontFamily = FontFamily(Font(R.font.montserrat_regular)),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.Gray
@@ -150,6 +154,7 @@ fun UserMessage(message: Message) {
     ) {
         Text(
             text = message.content,
+            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
             modifier = Modifier
                 .background(Color(0xFF360568), RoundedCornerShape(12.dp))
                 .padding(12.dp, 13.dp),
@@ -159,6 +164,7 @@ fun UserMessage(message: Message) {
         )
         Text(
             text = message.timestamp,
+            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
             fontSize = 10.sp,
             color = Color(0xFF797C7B),
             modifier = Modifier.padding(top = 8.dp)
@@ -182,6 +188,7 @@ fun TutorMessage(message: Message) {
             Spacer(modifier = Modifier.width(11.dp))
             Text(
                 text = "Tutor",
+                fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -189,6 +196,7 @@ fun TutorMessage(message: Message) {
         Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = message.content,
+            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
             modifier = Modifier
                 .background(Color(0xFFF2F7FB), RoundedCornerShape(12.dp))
                 .padding(12.dp),
@@ -197,6 +205,8 @@ fun TutorMessage(message: Message) {
         )
         Text(
             text = message.timestamp,
+            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
+
             fontSize = 10.sp,
             color = Color(0xFF797C7B),
             modifier = Modifier
