@@ -72,22 +72,41 @@ fun HomeScreen(navController: NavController) {
                             modifier = Modifier
                                 .padding(vertical = 16.dp)
                                 .clickable {
-                                    navController.navigate("courses")
+                                    navController.navigate("chat")
                                 }
                         )
                     }
                 }
                 item { HomeCourseList(onAddNewCourse = {showKnowledgeBaseModal = true}) }
                 item {
-                    Text(
-                        "Activities",
-                        style = TextStyle(
-                            fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 25.sp
-                        ),
-                        modifier = Modifier.padding(vertical = 16.dp)
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            "Your Courses",
+                            style = TextStyle(
+                                fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 25.sp
+                            ),
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                        Text(
+                            "See all",
+                            style = TextStyle(
+                                fontFamily = FontFamily(Font(R.font.montserrat_regular)),
+                                color = CustomPrimaryStart,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium
+                            ),
+                            modifier = Modifier
+                                .padding(vertical = 16.dp)
+                                .clickable {
+                                    navController.navigate("chat")
+                                }
+                        )
+                    }
                 }
                 item { HomeActivityList { navController.navigate("chat") } }
             }
