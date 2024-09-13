@@ -17,13 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.educhat.ui.components.chat.Assistant
 import com.example.educhat.ui.components.chat.AssistantCard
+import com.example.educhat.ui.components.chat.CreateAssistantDialog
+import com.example.educhat.ui.components.chat.KnowledgeBase
 import com.example.educhat.ui.components.home.Montserrat
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
-
 
 // API interface
 interface AssistantApi {
@@ -32,7 +33,27 @@ interface AssistantApi {
 
     @DELETE("api/assistant/{id}")
     suspend fun deleteAssistant(@Path("id") id: String): Response<Unit>
+
+    @GET("api/knowledge_base")
+    suspend fun getKnowledgeBases(): List<KnowledgeBase>
+
+    @POST("api/assistant")
+    suspend fun createAssistant(@Body assistant: AssistantCreationRequest): Response<Assistant>
 }
+
+data class AssistantCreationRequest(
+    val name: String,
+    val description: String,
+    val systemprompt: String,
+    val knowledge_base_id: String,
+    val configuration: AssistantConfiguration
+)
+
+data class AssistantConfiguration(
+    val model: String,
+    val service: String = "openai",
+    val temperature: String = "0.8"
+)
 
 // Retrofit instance
 val retrofit = Retrofit.Builder()
@@ -48,6 +69,7 @@ fun AssistantCardsScreen(navController: NavController) {
     var assistants by remember { mutableStateOf<List<Assistant>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
+    var showCreateDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -73,7 +95,7 @@ fun AssistantCardsScreen(navController: NavController) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Implement create assistant */ }) {
+                    IconButton(onClick = { showCreateDialog = true }) {
                         Icon(Icons.Filled.Add, contentDescription = "Create Assistant")
                     }
                 },
@@ -98,7 +120,7 @@ fun AssistantCardsScreen(navController: NavController) {
                     items(assistants) { assistant ->
                         AssistantCard (
                             assistant = assistant,
-                            onSelect = { /* TODO: Implement navigation to chat */ },
+                            onSelect = { navController.navigate("chat/${assistant.id}") },
                             onDelete = { deletedAssistant ->
                                 coroutineScope.launch {
                                     deleteAssistant(
@@ -118,59 +140,28 @@ fun AssistantCardsScreen(navController: NavController) {
             }
         }
     }
+
+    CreateAssistantDialog(
+        isOpen = showCreateDialog,
+        onClose = { showCreateDialog = false },
+        onCreateSuccess = {
+            coroutineScope.launch {
+                fetchAssistants(
+                    onSuccess = { fetchedAssistants ->
+                        assistants = fetchedAssistants.sortedByDescending { it.created_at }
+                    },
+                    onError = { errorMessage ->
+                        error = errorMessage
+                    }
+                )
+            }
+        },
+        fetchKnowledgeBases = { fetchKnowledgeBases() },
+        createAssistant = { name, description, systemPrompt, knowledgeBaseId, model, onSuccess, onError ->
+            createAssistant(name, description, systemPrompt, knowledgeBaseId, model, onSuccess, onError)
+        }
+    )
 }
-//
-//@Composable
-//fun AssistantCard(
-//    assistant: Assistant,
-//    onSelect: (Assistant) -> Unit,
-//    onDelete: (Assistant) -> Unit
-//) {
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(16.dp),
-//        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-//    ) {
-//        Column(
-//            modifier = Modifier
-//                .padding(16.dp)
-//                .fillMaxWidth()
-//        ) {
-//            Text(
-//                text = assistant.name,
-//                style = MaterialTheme.typography.headlineSmall,
-//                fontWeight = FontWeight.Bold
-//            )
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Text(
-//                text = assistant.description,
-//                style = MaterialTheme.typography.bodyMedium
-//            )
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Text(
-//                text = "Model: ${assistant.configuration["model"]}",
-//                style = MaterialTheme.typography.bodySmall,
-//                color = MaterialTheme.colorScheme.secondary
-//            )
-//            Spacer(modifier = Modifier.height(16.dp))
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween
-//            ) {
-//                Button(onClick = { onSelect(assistant) }) {
-//                    Text("Select")
-//                }
-//                Button(
-//                    onClick = { onDelete(assistant) },
-//                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-//                ) {
-//                    Text("Delete")
-//                }
-//            }
-//        }
-//    }
-//}
 
 @Composable
 fun LoadingSpinner() {
@@ -222,5 +213,46 @@ suspend fun deleteAssistant(
         }
     } catch (e: Exception) {
         onError("Error deleting assistant: ${e.message}")
+    }
+}
+
+suspend fun fetchKnowledgeBases(): List<KnowledgeBase> {
+    return try {
+        assistantApi.getKnowledgeBases()
+    } catch (e: Exception) {
+        println("Error fetching knowledge bases: ${e.message}")
+        emptyList()
+    }
+}
+
+suspend fun createAssistant(
+    name: String,
+    description: String,
+    systemPrompt: String,
+    knowledgeBaseId: String,
+    model: String,
+    onSuccess: () -> Unit,
+    onError: (String) -> Unit
+) {
+    try {
+        val assistantRequest = AssistantCreationRequest(
+            name = name,
+            description = description,
+            systemprompt = systemPrompt,
+            knowledge_base_id = "1",
+            configuration = AssistantConfiguration(
+                model = model
+            )
+        )
+
+        val response = assistantApi.createAssistant(assistantRequest)
+
+        if (response.isSuccessful) {
+            onSuccess()
+        } else {
+            onError("Failed to create assistant: ${response.errorBody()?.string() ?: "Unknown error"}")
+        }
+    } catch (e: Exception) {
+        onError("Error creating assistant: ${e.message}")
     }
 }
