@@ -1,4 +1,5 @@
 package com.example.educhat
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,6 +10,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,9 +21,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.educhat.ui.components.chat.Assistant
+import com.example.educhat.ui.components.chat.Conversation
+import com.example.educhat.ui.components.chat.DateIndicator
+import com.example.educhat.ui.components.chat.Message
+import com.example.educhat.ui.components.chat.TutorMessage
+import com.example.educhat.ui.components.chat.UserMessage
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
@@ -29,26 +39,8 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import okhttp3.*
-import okio.ByteString
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import com.google.gson.Gson
 
-data class Message(
-    val content: String,
-    val isUser: Boolean,
-    val timestamp: String
-)
-
-data class Assistant(
-    val id: String,
-    val name: String
-)
-
-data class Conversation(
-    val id: String,
-    val messages: List<Message>
-)
 
 class WebSocketClient(url: String, private val listener: WebSocketListener) {
     private val client = OkHttpClient()
@@ -85,6 +77,7 @@ val apiService: ApiService = Retrofit.Builder()
     .build()
     .create(ApiService::class.java)
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatScreen(navController: NavController, assistantId: String) {
     var assistants by remember { mutableStateOf<List<Assistant>>(emptyList()) }
@@ -156,12 +149,12 @@ fun ChatScreen(navController: NavController, assistantId: String) {
         topBar = {
             ChatHeader(navController, selectedAssistant?.name ?: "")
         }
-    ) { paddingValues ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
-                .padding(paddingValues)
+                .padding(innerPadding)
         ) {
             Box(
                 modifier = Modifier
@@ -230,13 +223,9 @@ fun ChatHeader(navController: NavController, name: String) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.return_icon),
-                    contentDescription = "Return Icon",
-                    modifier = Modifier
-                        .size(34.dp)
-                        .clickable { navController.popBackStack() }
-                )
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                }
                 Spacer(modifier = Modifier.width(20.dp))
                 Column {
                     Text(
@@ -249,98 +238,9 @@ fun ChatHeader(navController: NavController, name: String) {
             }
         },
         backgroundColor = Color.White,
-        elevation = 4.dp
+        elevation = 4.dp,
+        modifier = Modifier.height(56.dp) // Explicitly set the height of the TopAppBar
     )
-}
-
-@Composable
-fun DateIndicator() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Today",
-            modifier = Modifier
-                .background(Color(0xFFF8FBF9), RoundedCornerShape(6.dp))
-                .padding(horizontal = 12.dp, vertical = 6.dp),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color(0xFF000E08)
-        )
-    }
-}
-
-@Composable
-fun UserMessage(message: Message) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.End
-    ) {
-        Text(
-            text = message.content,
-            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-            modifier = Modifier
-                .background(Color(0xFF360568), RoundedCornerShape(12.dp))
-                .padding(12.dp, 13.dp),
-            color = Color.White,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium
-        )
-        Text(
-            text = message.timestamp,
-            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-            fontSize = 10.sp,
-            color = Color(0xFF797C7B),
-            modifier = Modifier.padding(top = 8.dp)
-        )
-    }
-}
-
-@Composable
-fun TutorMessage(message: Message) {
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-//        Row(verticalAlignment = Alignment.CenterVertically) {
-//            Image(
-//                painter = painterResource(id = R.drawable.tutor_avatar),
-//                contentDescription = "Tutor Avatar",
-//                modifier = Modifier
-//                    .size(40.dp)
-//                    .clip(CircleShape)
-//            )
-//            Spacer(modifier = Modifier.width(11.dp))
-//            Text(
-//                text = "Tutor",
-//                fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
-//                fontSize = 14.sp,
-//                fontWeight = FontWeight.Medium
-//            )
-//        }
-//        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = message.content,
-            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-            modifier = Modifier
-                .background(Color(0xFFF2F7FB), RoundedCornerShape(12.dp))
-                .padding(12.dp),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium
-        )
-        Text(
-            text = message.timestamp,
-            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-
-            fontSize = 10.sp,
-            color = Color(0xFF797C7B),
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .align(Alignment.Start)
-        )
-    }
 }
 
 @Composable
