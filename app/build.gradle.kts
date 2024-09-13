@@ -74,5 +74,5 @@ dependencies {
     implementation(libs.androidx.navigation.compose.v271)
     implementation(libs.androidx.material3)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2")
-    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation(libs.okhttp)
 }
