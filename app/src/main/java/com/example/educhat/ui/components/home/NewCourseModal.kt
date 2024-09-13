@@ -34,6 +34,8 @@ import kotlinx.coroutines.launch
 import org.json.JSONArray
 import java.util.concurrent.TimeUnit
 import android.util.Log;
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 class KnowledgeBaseViewModel : ViewModel() {
     private var webSocket: WebSocket? = null
@@ -165,10 +167,8 @@ class KnowledgeBaseViewModel : ViewModel() {
     }
 }
 
-
 @Composable
 fun KnowledgeBaseScreen(viewModel: KnowledgeBaseViewModel, onDismiss: () -> Unit) {
-
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -182,9 +182,7 @@ fun KnowledgeBaseScreen(viewModel: KnowledgeBaseViewModel, onDismiss: () -> Unit
                         Text(
                             "Course Generator",
                             color = Color.Black,
-                            style = TextStyle(
-                                fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
-                                fontSize = 20.sp)
+                            style = MaterialTheme.typography.h6
                         )
                     }
                 },
@@ -192,24 +190,93 @@ fun KnowledgeBaseScreen(viewModel: KnowledgeBaseViewModel, onDismiss: () -> Unit
                 elevation = 0.dp
             )
 
-            // Main content with animations
-            Box(
+            // Main content using LazyColumn for efficient scrolling
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                Column {
-                    CourseOptionsSection(viewModel, onDismiss = { onDismiss() })
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Divider(color = Color.White.copy(alpha = 0.5f))
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CourseContentSection(viewModel)
+                // Conditionally add CourseOptionsSection as a header
+                if (!viewModel.isLoading) {
+                    item {
+                        CourseOptionsSection(viewModel, onDismiss = { onDismiss() })
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Divider(color = Color.Gray.copy(alpha = 0.5f))
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
 
+                // Add Spinner as an item behind the Course Content Title
+                if (viewModel.isLoading) {
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
+                        ) {
+                            CircularProgressIndicator(color = CustomPrimaryStart, modifier = Modifier.size(24.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Generating your course...",
+                                color = CustomPrimaryStart,
+                                style = MaterialTheme.typography.body1
+                            )
+                        }
+                    }
+                }
+
+                // Course Content Section Title
+                item {
+                    Text(
+                        "Course Content",
+                        style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                // Course Content Items
+                items(viewModel.sections) { section ->
+                    CourseContentItem(section)
+                }
+
+                item{ CourseContentSection(viewModel) }
+
+                // Display Completion Screen as an Overlay using Box
                 if (viewModel.isCompleted) {
-                    CompletionScreen(onDismiss = onDismiss)
+                    item {
+                        CompletionScreen(onDismiss = onDismiss)
+                    }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun CourseContentItem(section: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        backgroundColor = Color.White.copy(alpha = 0.9f),
+        elevation = 4.dp
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_link),
+                contentDescription = "Section Icon",
+                tint = Color(0xFF0D47A1),
+                modifier = Modifier.padding(start = 16.dp)
+            )
+            Text(
+                text = section,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .weight(1f),
+                style = MaterialTheme.typography.body1
+            )
         }
     }
 }
@@ -287,59 +354,8 @@ fun CourseOptionsSection(viewModel: KnowledgeBaseViewModel, onDismiss: () -> Uni
 @Composable
 fun CourseContentSection(viewModel: KnowledgeBaseViewModel) {
     Column {
-        Text(
-            "Course Content",
-            style = TextStyle(
-                fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
-                fontSize = 20.sp),
-            color = Color.Black
-        )
 
         Spacer(modifier = Modifier.height(8.dp))
-
-        if (viewModel.sections.isNotEmpty()) {
-            LazyColumn {
-                items(viewModel.sections) { section ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        backgroundColor = Color.White.copy(alpha = 0.9f),
-                        elevation = 4.dp
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_link),
-                                contentDescription = "Section Icon",
-                                tint = Color(0xFF0D47A1),
-                                modifier = Modifier.padding(start = 16.dp)
-                            )
-                            Text(
-                                text = section,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .weight(1f),
-                                style = MaterialTheme.typography.body1
-                            )
-                        }
-                    }
-                }
-            }
-        } else if (viewModel.isLoading) {
-            // Display a custom loading animation
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = Color.White,
-                    strokeWidth = 4.dp,
-                    modifier = Modifier.size(64.dp)
-                )
-            }
-        }
 
         if (viewModel.isHumanFeedbackRequired) {
             Spacer(modifier = Modifier.height(16.dp))
