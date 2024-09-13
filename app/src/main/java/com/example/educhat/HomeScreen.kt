@@ -49,7 +49,7 @@ fun HomeScreen(navController: NavController) {
                 }
                 item {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
@@ -80,11 +80,11 @@ fun HomeScreen(navController: NavController) {
                 item { HomeCourseList(onAddNewCourse = {showKnowledgeBaseModal = true}) }
                 item {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            "Your Courses",
+                            "Your Assistants",
                             style = TextStyle(
                                 fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
                                 fontWeight = FontWeight.SemiBold,
