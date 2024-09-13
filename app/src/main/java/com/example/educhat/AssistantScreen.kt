@@ -98,7 +98,7 @@ fun AssistantCardsScreen(navController: NavController) {
                     items(assistants) { assistant ->
                         AssistantCard (
                             assistant = assistant,
-                            onSelect = { /* TODO: Implement navigation to chat */ },
+                            onSelect = { navController.navigate("chat/1") },
                             onDelete = { deletedAssistant ->
                                 coroutineScope.launch {
                                     deleteAssistant(

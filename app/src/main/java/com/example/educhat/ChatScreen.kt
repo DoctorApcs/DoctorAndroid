@@ -22,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.educhat.R
 import kotlinx.coroutines.launch
 
 data class Message(
@@ -32,7 +31,7 @@ data class Message(
 )
 
 @Composable
-fun ChatScreen(navController: NavController) {
+fun ChatScreen(navController: NavController, assistantId: String) {
     val messages = remember {
         mutableStateListOf(
             Message("Hello! John abraham", true, "09:25 AM"),
