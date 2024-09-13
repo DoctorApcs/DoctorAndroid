@@ -21,7 +21,7 @@ fun MyApp(modifier: Modifier = Modifier) {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "home",
+            startDestination = "welcome",
             modifier = Modifier.padding(innerPadding)
         ) {
             // A composable that is used to navigate to all the screens

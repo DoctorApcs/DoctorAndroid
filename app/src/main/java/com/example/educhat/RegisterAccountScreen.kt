@@ -1,4 +1,3 @@
-// WelcomeBackScreen.kt
 package com.example.educhat
 
 import androidx.compose.foundation.BorderStroke
@@ -29,9 +28,11 @@ import com.example.educhat.ui.components.Visibility
 import com.example.educhat.ui.components.Visibility_off
 
 @Composable
-fun WelcomeBackScreen(navController: NavHostController) {
+fun RegisterAccountScreen(navController: NavHostController) {
+    var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
     val customTextStyle = TextStyle(
@@ -48,13 +49,12 @@ fun WelcomeBackScreen(navController: NavHostController) {
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 137.dp),
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Welcome back",
+                text = "Create Account",
                 fontSize = 25.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.Black,
@@ -73,9 +73,23 @@ fun WelcomeBackScreen(navController: NavHostController) {
                 Column(
                     modifier = Modifier
                         .padding(top = 20.dp)
-                        .padding(horizontal = 20.dp),
+                        .padding(horizontal = 20.dp)
+                        .padding(bottom = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Name") },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Gray,
+                            unfocusedBorderColor = Color.LightGray,
+                            cursorColor = Color.DarkGray
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
@@ -89,12 +103,30 @@ fun WelcomeBackScreen(navController: NavHostController) {
                         shape = RoundedCornerShape(8.dp)
                     )
 
-//                    Spacer(modifier = Modifier.height(2.dp))
-
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
                         label = { Text("Password") },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            val icon = if (passwordVisible) Visibility else Visibility_off
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(imageVector = icon, contentDescription = null)
+                            }
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Gray,
+                            unfocusedBorderColor = Color.LightGray,
+                            cursorColor = Color.DarkGray
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+
+                    OutlinedTextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        label = { Text("Confirm Password") },
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
                             val icon = if (passwordVisible) Visibility else Visibility_off
@@ -121,20 +153,7 @@ fun WelcomeBackScreen(navController: NavHostController) {
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C2C2C))
                     ) {
-                        Text("Sign In", color = Color.White)
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 15.dp),
-                        contentAlignment = Alignment.CenterEnd
-                    ) {
-                        Text(
-                            text = "Forgot password?",
-                            textDecoration = TextDecoration.Underline,
-                            color = Color.Black.copy(alpha = 0.5f)
-                        )
+                        Text("Register", color = Color.White)
                     }
                 }
             }
@@ -152,6 +171,6 @@ fun WelcomeBackScreen(navController: NavHostController) {
 
 @Composable
 @Preview(showBackground = true)
-fun WelcomeBackScreenPreview() {
-    WelcomeBackScreen(rememberNavController())
+fun RegisterAccountScreenPreview() {
+    RegisterAccountScreen(rememberNavController())
 }
