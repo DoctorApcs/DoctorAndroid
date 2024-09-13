@@ -30,23 +30,57 @@ import com.example.educhat.ui.theme.CustomPrimaryStart
 fun HomeScreen(navController: NavController) {
     var showKnowledgeBaseModal by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            item {
-                WelcomeSection()
-                AnalyticsSection(navController)
-            }
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
+    // Knowledge Base Modal
+    if (showKnowledgeBaseModal) {
+        KnowledgeBaseModal(
+            onDismiss = { showKnowledgeBaseModal = false },
+        )
+    } else {
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                item {
+                    WelcomeSection()
+                    AnalyticsSection(navController)
+                }
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            "Your Courses",
+                            style = TextStyle(
+                                fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 25.sp
+                            ),
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                        Text(
+                            "See all",
+                            style = TextStyle(
+                                fontFamily = FontFamily(Font(R.font.montserrat_regular)),
+                                color = CustomPrimaryStart,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium
+                            ),
+                            modifier = Modifier
+                                .padding(vertical = 16.dp)
+                                .clickable {
+                                    navController.navigate("courses")
+                                }
+                        )
+                    }
+                }
+                item { HomeCourseList(onAddNewCourse = {showKnowledgeBaseModal = true}) }
+                item {
                     Text(
-                        "Your Courses",
+                        "Activities",
                         style = TextStyle(
                             fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
                             fontWeight = FontWeight.SemiBold,
@@ -54,72 +88,17 @@ fun HomeScreen(navController: NavController) {
                         ),
                         modifier = Modifier.padding(vertical = 16.dp)
                     )
-                    Text(
-                        "See all",
-                        style = TextStyle(
-                            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-                            color = CustomPrimaryStart,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium
-                        ),
-                        modifier = Modifier
-                            .padding(vertical = 16.dp)
-                            .clickable {
-                                navController.navigate("courses")
-                            }
-                    )
                 }
+                item { HomeActivityList { navController.navigate("chat") } }
             }
-            item { HomeCourseList(onAddNewCourse = {showKnowledgeBaseModal = true}) }
-            item {
-                Text(
-                    "Activities",
-                    style = TextStyle(
-                        fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 25.sp
-                    ),
-                    modifier = Modifier.padding(vertical = 16.dp)
-                )
-            }
-            item { HomeActivityList { navController.navigate("chat") } }
+
+
         }
-
-
-    }
-
-    // Knowledge Base Modal
-    if (showKnowledgeBaseModal) {
-        KnowledgeBaseModal(
-            onDismiss = { showKnowledgeBaseModal = false },
-            onCreateKnowledgeBase = { /* Handle knowledge base creation */ }
-        )
     }
 }
 
 @Composable
-fun KnowledgeBaseModal(
-    onDismiss: () -> Unit,
-    onCreateKnowledgeBase: () -> Unit
-) {
-    val viewModel: KnowledgeBaseViewModel = viewModel()
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Create Knowledge Base") },
-        text = { KnowledgeBaseScreen(viewModel) },
-        confirmButton = {
-            Button(onClick = {
-                onCreateKnowledgeBase()
-                onDismiss()
-            }) {
-                Text("Create")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
+fun KnowledgeBaseModal(onDismiss: () -> Unit) {
+    val viewModel = KnowledgeBaseViewModel()
+    KnowledgeBaseScreen(viewModel, { onDismiss() })
 }
