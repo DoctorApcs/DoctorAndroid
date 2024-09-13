@@ -72,7 +72,7 @@ fun HomeScreen(navController: NavController) {
                             modifier = Modifier
                                 .padding(vertical = 16.dp)
                                 .clickable {
-                                    navController.navigate("chat")
+                                    navController.navigate("courses")
                                 }
                         )
                     }
