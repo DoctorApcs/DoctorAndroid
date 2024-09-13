@@ -1,5 +1,6 @@
 package com.example.educhat
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,6 +21,7 @@ import com.example.educhat.ui.components.chat.AssistantCard
 import com.example.educhat.ui.components.chat.CreateAssistantDialog
 import com.example.educhat.ui.components.chat.KnowledgeBase
 import com.example.educhat.ui.components.home.Montserrat
+import com.example.educhat.ui.theme.CustomPrimaryStart
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -95,8 +97,22 @@ fun AssistantCardsScreen(navController: NavController) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { showCreateDialog = true }) {
-                        Icon(Icons.Filled.Add, contentDescription = "Create Assistant")
+                    Button(
+                        onClick = { showCreateDialog = true },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = CustomPrimaryStart,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Filled.Add,
+                                contentDescription = "Create Assistant",
+                                modifier = Modifier.size(ButtonDefaults.IconSize)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text("New", fontFamily = Montserrat)
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
