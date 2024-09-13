@@ -1,4 +1,5 @@
 package com.example.educhat.ui.components.home
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,9 +34,17 @@ import com.example.educhat.ui.theme.CustomPrimaryStart
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import java.util.concurrent.TimeUnit
-import android.util.Log;
+import android.util.Log
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.style.TextOverflow
+
+// Define Montserrat FontFamily
+val Montserrat = FontFamily(
+    Font(R.font.montserrat_regular),
+    Font(R.font.montserrat_semi_bold, FontWeight.Bold),
+    Font(R.font.montserrat_semi_bold, FontWeight.SemiBold)
+)
 
 class KnowledgeBaseViewModel : ViewModel() {
     private var webSocket: WebSocket? = null
@@ -58,6 +67,9 @@ class KnowledgeBaseViewModel : ViewModel() {
     var isCompleted by mutableStateOf(false)
     var sources by mutableStateOf(listOf<String>())
     private val API_BASE_URL = "ws://10.0.2.2:8000/api/knowledge_base/generate_course"
+
+    // New state to manage Course Options visibility
+    var showCourseOptions by mutableStateOf(true)
 
     init {
         connectWebSocket()
@@ -82,7 +94,7 @@ class KnowledgeBaseViewModel : ViewModel() {
                 viewModelScope.launch {
                     // Handle connection failure
                     logs = "WebSocket connection failed: ${t.message}"
-                    Log.e("ERROR","WebSocket connection failed: ${t.message}")
+                    Log.e("ERROR", "WebSocket connection failed: ${t.message}")
                 }
             }
 
@@ -114,6 +126,7 @@ class KnowledgeBaseViewModel : ViewModel() {
                 "end" -> {
                     isCompleted = true
                     isLoading = false
+                    showCourseOptions = false // Hide Course Options when done
                 }
                 "logs" -> {
                     val content = data.getString("content")
@@ -142,6 +155,7 @@ class KnowledgeBaseViewModel : ViewModel() {
         webSocket?.send(formData.toString())
         isLoading = true
         logs = "Submitting query..."
+        showCourseOptions = false // Hide Course Options when submitting
     }
 
     fun handleFeedback() {
@@ -182,7 +196,7 @@ fun KnowledgeBaseScreen(viewModel: KnowledgeBaseViewModel, onDismiss: () -> Unit
                         Text(
                             "Course Generator",
                             color = Color.Black,
-                            style = MaterialTheme.typography.h6
+                            style = MaterialTheme.typography.h6.copy(fontFamily = Montserrat)
                         )
                     }
                 },
@@ -197,11 +211,9 @@ fun KnowledgeBaseScreen(viewModel: KnowledgeBaseViewModel, onDismiss: () -> Unit
                     .padding(16.dp)
             ) {
                 // Conditionally add CourseOptionsSection as a header
-                if (!viewModel.isLoading) {
+                if (viewModel.showCourseOptions && !viewModel.isLoading) {
                     item {
                         CourseOptionsSection(viewModel, onDismiss = { onDismiss() })
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Divider(color = Color.Gray.copy(alpha = 0.5f))
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
@@ -226,22 +238,12 @@ fun KnowledgeBaseScreen(viewModel: KnowledgeBaseViewModel, onDismiss: () -> Unit
                     }
                 }
 
-                // Course Content Section Title
-                item {
-                    Text(
-                        "Course Content",
-                        style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
-                        color = Color.Black
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
                 // Course Content Items
                 items(viewModel.sections) { section ->
                     CourseContentItem(section)
                 }
 
-                item{ CourseContentSection(viewModel) }
+                item { CourseContentSection(viewModel) }
 
                 // Display Completion Screen as an Overlay using Box
                 if (viewModel.isCompleted) {
@@ -267,7 +269,7 @@ fun CourseContentItem(section: String) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_link),
                 contentDescription = "Section Icon",
-                tint = Color(0xFF0D47A1),
+                tint = CustomPrimaryStart,
                 modifier = Modifier.padding(start = 16.dp)
             )
             Text(
@@ -275,7 +277,7 @@ fun CourseContentItem(section: String) {
                 modifier = Modifier
                     .padding(16.dp)
                     .weight(1f),
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.body1.copy(fontFamily = Montserrat)
             )
         }
     }
@@ -294,8 +296,9 @@ fun CourseOptionsSection(viewModel: KnowledgeBaseViewModel, onDismiss: () -> Uni
             Text(
                 text = "Create a New Course",
                 style = TextStyle(
-                    fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
-                    fontSize = 20.sp),
+                    fontFamily = Montserrat,
+                    fontSize = 20.sp
+                ),
                 color = CustomPrimaryStart
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -332,8 +335,8 @@ fun CourseOptionsSection(viewModel: KnowledgeBaseViewModel, onDismiss: () -> Uni
             ) {
                 OutlinedButton(
                     onClick = { onDismiss() },
-                    border = BorderStroke(1.dp, Color(0xFF0D47A1)),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF0D47A1))
+                    border = BorderStroke(1.dp, CustomPrimaryStart),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = CustomPrimaryStart)
                 ) {
                     Text("Cancel")
                 }
@@ -354,21 +357,20 @@ fun CourseOptionsSection(viewModel: KnowledgeBaseViewModel, onDismiss: () -> Uni
 @Composable
 fun CourseContentSection(viewModel: KnowledgeBaseViewModel) {
     Column {
-
         Spacer(modifier = Modifier.height(8.dp))
 
         if (viewModel.isHumanFeedbackRequired) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "We value your feedback! Please provide any suggestions:",
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.subtitle1.copy(fontFamily = Montserrat),
                 color = Color.White
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = viewModel.feedbackText,
                 onValueChange = { viewModel.feedbackText = it },
-                label = { Text("Your Feedback") },
+                label = { Text("Your Feedback", fontFamily = Montserrat) },
                 leadingIcon = {
                     Icon(Icons.Default.Favorite, contentDescription = "Feedback Icon")
                 },
@@ -379,31 +381,48 @@ fun CourseContentSection(viewModel: KnowledgeBaseViewModel) {
                     focusedBorderColor = Color.White,
                     focusedLabelColor = Color.White,
                     cursorColor = Color.White
-                )
+                ),
+                textStyle = TextStyle(fontFamily = Montserrat)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                // No Feedback Button
                 OutlinedButton(
                     onClick = {
-                        viewModel.feedbackText = ""
+                        viewModel.feedbackText = "No feedback"
                         viewModel.handleFeedback()
                     },
-                    border = BorderStroke(1.dp, Color.White),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                    border = BorderStroke(1.dp, CustomPrimaryStart),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = CustomPrimaryStart)
                 ) {
-                    Text("Skip")
+                    Text("No Feedback", fontFamily = Montserrat)
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(
-                    onClick = { viewModel.handleFeedback() },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
-                ) {
-                    Icon(Icons.Default.Send, contentDescription = "Submit Feedback", tint = Color(0xFF0D47A1))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Submit", color = Color(0xFF0D47A1))
+
+                Row {
+                    // Skip Button
+                    OutlinedButton(
+                        onClick = {
+                            viewModel.feedbackText = ""
+                            viewModel.handleFeedback()
+                        },
+                        border = BorderStroke(1.dp, Color.White),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                    ) {
+                        Text("Skip", fontFamily = Montserrat)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    // Submit Button
+                    Button(
+                        onClick = { viewModel.handleFeedback() },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
+                    ) {
+                        Icon(Icons.Default.Send, contentDescription = "Submit Feedback", tint = CustomPrimaryStart)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Submit", color = CustomPrimaryStart, fontFamily = Montserrat)
+                    }
                 }
             }
         }
@@ -412,42 +431,62 @@ fun CourseContentSection(viewModel: KnowledgeBaseViewModel) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 "Sources",
-                style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold, fontFamily = Montserrat),
                 color = Color.White
             )
             Spacer(modifier = Modifier.height(8.dp))
-            LazyRow {
-                items(viewModel.sources) { source ->
-                    Card(
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(120.dp),
-                        backgroundColor = Color.White.copy(alpha = 0.9f),
-                        elevation = 4.dp
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(8.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                Icons.Default.Email,
-                                contentDescription = "Source Icon",
-                                tint = Color(0xFF0D47A1),
-                                modifier = Modifier.size(40.dp)
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = getHostname(source),
-                                style = MaterialTheme.typography.caption,
-                                textAlign = TextAlign.Center
-                            )
-                        }
+
+            // Grid layout for sources
+            val chunkedSources = viewModel.sources.chunked(3)
+            chunkedSources.forEach { rowSources ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    rowSources.forEach { source ->
+                        SourceCard(source)
+                    }
+                    // Add empty boxes to fill the row if needed
+                    repeat(3 - rowSources.size) {
+                        Box(modifier = Modifier.weight(1f))
                     }
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
+        }
+    }
+}
+
+@Composable
+fun SourceCard(source: String) {
+    Card(
+        modifier = Modifier
+            .padding(end = 8.dp)
+            .size(100.dp),
+        backgroundColor = Color.White.copy(alpha = 0.9f),
+        elevation = 4.dp
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_link),
+                contentDescription = "Section Icon",
+                tint = CustomPrimaryStart,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = getHostname(source),
+                style = MaterialTheme.typography.caption.copy(fontFamily = Montserrat),
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
@@ -486,12 +525,11 @@ fun CompletionScreen(onDismiss: () -> Unit) {
                 onClick = { onDismiss() },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
             ) {
-                Text("Back to Home", color = Color(0xFF0D47A1))
+                Text("Back to Home", color = CustomPrimaryStart)
             }
         }
     }
 }
-
 
 fun getHostname(url: String): String {
     return try {
