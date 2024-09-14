@@ -28,7 +28,7 @@ fun MyApp(modifier: Modifier = Modifier) {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "home",
+            startDestination = "welcome",
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") { HomeScreen(navController = navController, courseViewModel = courseViewModel) }
