@@ -13,6 +13,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.Text
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.educhat.ui.theme.EduChatTheme
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -29,12 +31,17 @@ fun MyApp(modifier: Modifier = Modifier) {
             startDestination = "home",
             modifier = Modifier.padding(innerPadding)
         ) {
-            // A composable that is used to navigate to all the screens
-            // Here I called the AnalyticsScreen in the "home" router for simplicity, it should be called in the "analytics" router
-            composable("home") { HomeScreen(navController = navController,courseViewModel) }
+            composable("home") { HomeScreen(navController = navController, courseViewModel = courseViewModel) }
             composable("analytics") { AnalyticsScreen(navController = navController) }
             composable("welcome") { WelcomeBackScreen(navController = navController) }
-            composable("chat") { ChatScreen(navController = navController) }
+            composable(
+                route = "chat/{assistantId}",
+                arguments = listOf(navArgument("assistantId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val assistantId = backStackEntry.arguments?.getString("assistantId") ?: ""
+                ChatScreen(navController, assistantId)
+            }
+            composable("chat") { AssistantCardsScreen(navController = navController) }
             composable("courses") { CourseScreen(navController, courseViewModel) }
             composable("course_detail/{courseId}") { backStackEntry ->
                 val courseId = backStackEntry.arguments?.getString("courseId")

@@ -2,7 +2,6 @@ package com.example.educhat
 
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.annotation.DrawableRes
 data class BarChartData(val day: String, val value: Int)
 data class PieChartData(val category: String, val value: Int)

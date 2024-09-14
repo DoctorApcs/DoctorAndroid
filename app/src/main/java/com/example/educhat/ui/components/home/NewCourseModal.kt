@@ -16,7 +16,6 @@ import okhttp3.*
 import org.json.JSONObject
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.ui.draw.shadow
@@ -35,8 +34,9 @@ import kotlinx.coroutines.launch
 import org.json.JSONArray
 import java.util.concurrent.TimeUnit
 import android.util.Log
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.text.style.TextOverflow
 
 // Define Montserrat FontFamily
@@ -181,6 +181,7 @@ var isHumanFeedbackRequired by mutableStateOf(false)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KnowledgeBaseScreen(viewModel: KnowledgeBaseViewModel, onDismiss: () -> Unit) {
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -191,17 +192,14 @@ fun KnowledgeBaseScreen(viewModel: KnowledgeBaseViewModel, onDismiss: () -> Unit
         ) {
             // Enhanced TopAppBar with custom colors and icons
             TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            "Course Generator",
-                            color = Color.Black,
-                            style = MaterialTheme.typography.h6.copy(fontFamily = Montserrat)
-                        )
+                title = { Text("Your Assistants", fontWeight = FontWeight.Bold, fontFamily = Montserrat)},
+                navigationIcon = {
+                    IconButton(onClick = { onDismiss() }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
-                backgroundColor = Color.Transparent,
-                elevation = 0.dp
+                backgroundColor = Color.White,
+                modifier = Modifier.shadow(elevation = 4.dp)
             )
 
             // Main content using LazyColumn for efficient scrolling
