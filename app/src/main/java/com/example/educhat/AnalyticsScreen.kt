@@ -27,6 +27,10 @@ import com.aay.compose.barChart.BarChart
 import com.aay.compose.barChart.model.BarParameters
 import com.aay.compose.donutChart.PieChart
 import com.aay.compose.donutChart.model.PieChartData
+import com.example.educhat.ui.theme.CustomAccent
+import com.example.educhat.ui.theme.CustomPrimaryStart
+import com.example.educhat.ui.theme.CustomSecondary
+import com.example.educhat.ui.theme.Purple40
 
 class LearningData(
     val courseName: String,
@@ -35,9 +39,9 @@ class LearningData(
 )
 
 val learningData: List<LearningData> = listOf(
-    LearningData("CS305", listOf(1.0, 2.0, 2.4, 1.2, 2.3, 3.0, 0.5), Color(0xFF6C3428)),
-    LearningData("Mobile", listOf(0.5, 0.1, 0.2, 1.0, 2.0, 1.0, 0.4), Color(0xFFBA704F)),
-    LearningData("Calculus 3", listOf(0.1, 2.1, 2.3, 1.0, 3.0, 2.0, 1.4), Color(0xFFDFA878)),
+    LearningData("CS305", listOf(1.0, 2.0, 2.4, 1.2, 2.3, 3.0, 0.5), CustomPrimaryStart),
+    LearningData("Mobile", listOf(0.5, 0.1, 0.2, 1.0, 2.0, 1.0, 0.4), Purple40),
+    LearningData("Calculus 3", listOf(0.1, 2.1, 2.3, 1.0, 3.0, 2.0, 1.4), CustomAccent),
 )
 
 
