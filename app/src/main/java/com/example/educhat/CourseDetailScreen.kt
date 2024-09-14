@@ -1,25 +1,68 @@
 package com.example.educhat
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavHostController
+import com.example.educhat.ui.components.home.Montserrat
+import com.example.educhat.ui.theme.CustomBackground
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.BarData
@@ -29,31 +72,19 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.utils.ColorTemplate
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.clickable
-import androidx.compose.ui.window.Dialog
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.navigation.NavController
-import com.example.educhat.ui.components.home.HomeCourseList
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import com.example.educhat.ui.components.home.Montserrat
-import androidx.compose.ui.text.style.TextOverflow
+
+val COLORFUL_COLORS = intArrayOf(
+    android.graphics.Color.parseColor("#FF6B0ACE"),
+    android.graphics.Color.parseColor("#FF360568"),
+    android.graphics.Color.parseColor("#FF6B0ACE"),
+    android.graphics.Color.parseColor("#FFC8ABE6"),
+    android.graphics.Color.parseColor("#FF625b71")
+)
 
 @Composable
 fun CourseDetailsScreen(navController: NavHostController, courseId: String, courseViewModel: CourseViewModel) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Dashboard", "Uploads", "Conversations")
+    val tabs = listOf("Lessons", "Uploads", "Chat")
 
     val course = courseViewModel.getCourseById(courseId)
     var showKnowledgeBaseModal by remember { mutableStateOf(false) }
@@ -139,10 +170,11 @@ fun CourseDetailsScreen(navController: NavHostController, courseId: String, cour
                         Text(
                             text = title,
                             fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-                            color = if (selectedTab == index) Color.White else Color.Black,
+//                            color = if (selectedTab == index) Color.White else Color.Black,
+                            color = Color.Black,
                             fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
                             modifier = Modifier
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .padding(horizontal = 2.dp, vertical = 8.dp)
                                 .widthIn(min = 80.dp, max = 150.dp),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -150,18 +182,18 @@ fun CourseDetailsScreen(navController: NavHostController, courseId: String, cour
                     },
                     modifier = Modifier
                         .padding(horizontal = 8.dp)
-                        .let {
-                            if (selectedTab == index) {
-                                it.background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(Color(0xFF9C27B0), Color(0xFF673AB7))
-                                    ),
-                                    shape = RoundedCornerShape(16.dp)
-                                )
-                            } else {
-                                it
-                            }
-                        }
+//                        .let {
+//                            if (selectedTab == index) {
+//                                it.background(
+//                                    Brush.verticalGradient(
+//                                        colors = listOf(Color(0xFF9C27B0), Color(0xFF673AB7))
+//                                    ),
+//                                    shape = RoundedCornerShape(16.dp)
+//                                )
+//                            } else {
+//                                it
+//                            }
+//                        }
                 )
             }
         }
@@ -185,25 +217,24 @@ fun DashboardContent(course: Course,navController:NavHostController) {
         // Lessons Section
         Text(
             text = "Lessons",
-            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.headlineMedium.copy(fontFamily = Montserrat),
             modifier = Modifier.padding(16.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
+//        Spacer(modifier = Modifier.height(8.dp))
 
         // List of Lessons
         val lessons = course.lessons
         LessonList(navController = navController, lessons = lessons, courseId = course.id)
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         // Dashboard for the course
-        Text("Bar Chart:",fontFamily = FontFamily(Font(R.font.montserrat_regular)), style = MaterialTheme.typography.titleMedium)
+        Text("Learning Chart:",fontFamily = FontFamily(Font(R.font.montserrat_regular)), style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(16.dp))
         BarChartComposable(barChartData = course.barChartData)
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        Text("Pie Chart:",fontFamily = FontFamily(Font(R.font.montserrat_regular)), style = MaterialTheme.typography.titleMedium)
+        Text("Document Pie Chart:",fontFamily = FontFamily(Font(R.font.montserrat_regular)), style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(16.dp))
         PieChartComposable(pieChartData = course.pieChartData)
     }
@@ -405,7 +436,8 @@ fun ConversationItemCard(navController: NavHostController, activity: Activity) {
             .shadow(
                 elevation = 6.dp,
                 shape = RoundedCornerShape(20.dp)
-            ).clickable { navController.navigate("chat") },
+            )
+            .clickable { navController.navigate("chat") },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -420,12 +452,7 @@ fun ConversationItemCard(navController: NavHostController, activity: Activity) {
                     .width(75.dp)
                     .fillMaxHeight()
                     .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color(0xFF360568),
-                                Color(0xFF6B0ACE),
-                            )
-                        )
+                        CustomBackground
                     ),
                 contentAlignment = Alignment.Center
             ) {
@@ -509,13 +536,9 @@ fun ConversationItemCard(navController: NavHostController, activity: Activity) {
                         modifier = Modifier
                             .size(28.dp)
                             .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(
-                                        Color(0xFF360568),
-                                        Color(0xFF6B0ACE),
-                                    )
-                                ),
-                                shape = CircleShape),
+                                CustomBackground,
+                                shape = CircleShape
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -540,7 +563,7 @@ fun BarChartComposable(barChartData: List<BarChartData>) {
     }
 
     val barDataSet = BarDataSet(barEntries, "Bar Chart Data")
-    barDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList() // Use pre-defined colors
+    barDataSet.colors = COLORFUL_COLORS.toList()
 
     AndroidView(
         factory = { ctx ->
@@ -566,7 +589,7 @@ fun PieChartComposable(pieChartData: List<PieChartData>) {
     }
 
     val pieDataSet = PieDataSet(pieEntries, "Pie Chart Data")
-    pieDataSet.colors = ColorTemplate.COLORFUL_COLORS.toList() // Set colors
+    pieDataSet.colors = COLORFUL_COLORS.toList() // Set colors
 
     AndroidView(
         factory = { ctx ->
@@ -588,7 +611,9 @@ fun PieChartComposable(pieChartData: List<PieChartData>) {
 @Composable
 fun LessonList(navController: NavHostController, lessons: List<Lessonforcourse>, courseId: String) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
     ) {
         lessons.forEach { lesson ->
             LessonItem(navController, lesson, courseId) // Pass the navController and courseId
@@ -606,6 +631,7 @@ fun LessonItem(navController: NavHostController, lesson: Lessonforcourse, course
             .clickable {
                 navController.navigate("lessonDetail/${courseId}/${lesson.id}")
             },
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
