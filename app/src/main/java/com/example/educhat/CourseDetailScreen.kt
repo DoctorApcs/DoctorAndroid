@@ -43,7 +43,12 @@ import androidx.compose.material3.TabRow
 import androidx.navigation.NavController
 import com.example.educhat.ui.components.home.HomeCourseList
 import androidx.compose.material3.TabRowDefaults
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import com.example.educhat.ui.components.home.Montserrat
+import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
 fun CourseDetailsScreen(navController: NavHostController, courseId: String, courseViewModel: CourseViewModel) {
@@ -53,7 +58,7 @@ fun CourseDetailsScreen(navController: NavHostController, courseId: String, cour
     val course = courseViewModel.getCourseById(courseId)
     var showKnowledgeBaseModal by remember { mutableStateOf(false) }
 
-    // If the course is null, display a fallback message or screen
+
     if (course == null) {
         Text("Course not found", style = MaterialTheme.typography.bodyLarge)
         return
@@ -67,16 +72,16 @@ fun CourseDetailsScreen(navController: NavHostController, courseId: String, cour
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp) // Adjust the height as per your design
+                .height(200.dp)
         ) {
             Image(
-                painter = painterResource(id = course.imageResId), // Replace with your actual image resource
+                painter = painterResource(id = course.imageResId),
                 contentDescription = "Course Background",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
 
-            // Add the navigation button and course title on top of the background image
+
 
         }
 
@@ -85,13 +90,13 @@ fun CourseDetailsScreen(navController: NavHostController, courseId: String, cour
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            // Back button aligned to the left
+
             IconButton(
                 onClick = { navController.popBackStack() },
-                modifier = Modifier.align(Alignment.CenterStart) // Aligns to the start (left)
+                modifier = Modifier.align(Alignment.CenterStart)
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_back), // Replace with your back icon
+                    painter = painterResource(id = R.drawable.ic_back),
                     contentDescription = "Back",
                     tint = Color.Black
                 )
@@ -120,11 +125,10 @@ fun CourseDetailsScreen(navController: NavHostController, courseId: String, cour
 //            }
 //        }
 // Tabs with custom text styling for highlight
-        // Custom Tabs
-        // Custom Tabs
+
         TabRow(
             selectedTabIndex = selectedTab,
-            containerColor = Color.White, // Background color for TabRow
+            containerColor = Color.White,
             contentColor = Color.Black
         ) {
             tabs.forEachIndexed { index, title ->
@@ -134,10 +138,14 @@ fun CourseDetailsScreen(navController: NavHostController, courseId: String, cour
                     text = {
                         Text(
                             text = title,
+                            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
                             color = if (selectedTab == index) Color.White else Color.Black,
                             fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
                             modifier = Modifier
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .widthIn(min = 80.dp, max = 150.dp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     },
                     modifier = Modifier
@@ -161,7 +169,7 @@ fun CourseDetailsScreen(navController: NavHostController, courseId: String, cour
         when (selectedTab) {
             0 -> course?.let { DashboardContent(course = it,navController) } // Pass the course object to DashboardContent
             1 -> course?.let { UploadsContent() }   // Assuming you'll pass course data to UploadsContent
-            2 -> course?.let { ConversationsContent(navController) } // Assuming the same for ConversationsContent
+            2 -> course?.let { ConversationsContent(navController,course) } // Assuming the same for ConversationsContent
         }
     }
 }
@@ -177,6 +185,7 @@ fun DashboardContent(course: Course,navController:NavHostController) {
         // Lessons Section
         Text(
             text = "Lessons",
+            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(16.dp)
         )
@@ -188,13 +197,13 @@ fun DashboardContent(course: Course,navController:NavHostController) {
 
         Spacer(modifier = Modifier.height(32.dp))
         // Dashboard for the course
-        Text("Bar Chart:", style = MaterialTheme.typography.titleMedium)
+        Text("Bar Chart:",fontFamily = FontFamily(Font(R.font.montserrat_regular)), style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(16.dp))
         BarChartComposable(barChartData = course.barChartData)
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Text("Pie Chart:", style = MaterialTheme.typography.titleMedium)
+        Text("Pie Chart:",fontFamily = FontFamily(Font(R.font.montserrat_regular)), style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(16.dp))
         PieChartComposable(pieChartData = course.pieChartData)
     }
@@ -224,7 +233,7 @@ fun UploadsContent() {
             .padding(top = 16.dp)
     ) {
         // Show recent uploads section
-        Text(text = "Recent Uploads", style = MaterialTheme.typography.bodyLarge, color = Color.Black)
+        Text(text = "Recent Uploads",fontFamily = FontFamily(Font(R.font.montserrat_regular)), style = MaterialTheme.typography.bodyLarge, color = Color.Black)
         Spacer(modifier = Modifier.height(8.dp))
 
         // Show history of uploads (sorted by time)
@@ -258,6 +267,9 @@ fun UploadsContent() {
                     embedLink = "https://youtube.com" // You can prompt for link input here
                     // Add the link to history
                     uploadHistory.add(UploadHistoryItem(UploadType.LINK, embedLink, System.currentTimeMillis()))
+                },
+                onCancel = {
+                    showDialog = false
                 }
             )
         }
@@ -306,7 +318,7 @@ fun Long.toFormattedTime(): String {
 }
 
 @Composable
-fun ActionDialog(onFileUpload: () -> Unit, onEmbedLink: () -> Unit) {
+fun ActionDialog(onFileUpload: () -> Unit, onEmbedLink: () -> Unit,onCancel: () -> Unit) {
     Dialog(onDismissRequest = { /* Handle dismiss */ }) {
         Surface(
             modifier = Modifier
@@ -319,7 +331,7 @@ fun ActionDialog(onFileUpload: () -> Unit, onEmbedLink: () -> Unit) {
                     .background(Color.White)
                     .padding(16.dp)
             ) {
-                Text(text = "Choose Action", style = MaterialTheme.typography.bodyLarge, color = Color.Black)
+                Text(text = "Choose Action", fontFamily = FontFamily(Font(R.font.montserrat_regular)),style = MaterialTheme.typography.bodyLarge, color = Color.Black)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -336,32 +348,45 @@ fun ActionDialog(onFileUpload: () -> Unit, onEmbedLink: () -> Unit) {
                     onClick = onEmbedLink,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Embed Link")
+
+                    Text("Embed Link",fontFamily = FontFamily(Font(R.font.montserrat_regular)))
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                // Cancel Button
+                Button(
+                    onClick = onCancel, // Dismiss the dialog when cancel is clicked
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray) // Optional: Change color for cancel button
+                ) {
+                    Text("Cancel", fontFamily = FontFamily(Font(R.font.montserrat_regular)))
                 }
             }
         }
     }
 }
 @Composable
-fun ConversationsContent(navController: NavHostController) {
+fun ConversationsContent(navController: NavHostController,course:Course) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()) // Enable scrolling
             .padding(top = 16.dp)
     ) {
-        // Conversations list
-        ConversationItemCard(navController,title = "Final Revision", description = "What is derivatives", timeAgo = "45mins ago")
-        Spacer(modifier = Modifier.height(8.dp))
-        ConversationItemCard(navController,title = "Final Revision", description = "What is derivatives", timeAgo = "45mins ago")
-        Spacer(modifier = Modifier.height(8.dp))
-        ConversationItemCard(navController,title = "Final Revision", description = "What is derivatives", timeAgo = "45mins ago")
+        // Conversations list from course activities
+        course.activities.forEach { activity ->
+            ConversationItemCard(
+                navController = navController,
+                activity
+
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Centered floating action button at the bottom
         FloatingActionButton(
-            onClick = { /* Handle chat action */ },
+            onClick = { navController.navigate("chat") },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally),
             containerColor = Color.White
@@ -372,82 +397,132 @@ fun ConversationsContent(navController: NavHostController) {
 }
 
 @Composable
-fun ConversationItemCard(navController: NavHostController,title: String, description: String, timeAgo: String) {
+fun ConversationItemCard(navController: NavHostController, activity: Activity) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-
-            .padding(vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(16.dp) // Rounded corners for the card
+            .height(120.dp)
+            .shadow(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(20.dp)
+            ).clickable { navController.navigate("chat") },
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxHeight(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left icon section with a gradient background
             Box(
                 modifier = Modifier
-                    .size(70.dp)
-                    .clip(RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)) // Rounded left side
+                    .width(75.dp)
+                    .fillMaxHeight()
                     .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(Color(0xFF6200EE), Color(0xFF9C27B0)) // Gradient colors (purple)
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFF360568),
+                                Color(0xFF6B0ACE),
+                            )
                         )
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_conversation), // Replace with your conversation icon
-                    contentDescription = "Conversation Icon",
+                    painter = painterResource(id = R.drawable.chat_icon),
+                    contentDescription = "Chat Icon",
                     tint = Color.White,
-                    modifier = Modifier.size(32.dp) // Icon size
+                    modifier = Modifier.size(30.dp)
                 )
             }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            // Middle text section
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Text(text = "Calculus 3", fontSize = 14.sp, color = Color.Gray)
-                Text(text = "me: $description", fontSize = 14.sp, color = Color.Gray)
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            // Right side "Back to chat" section
             Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Center
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(16.dp),
             ) {
-                // "Back to chat" text and time
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 12.dp)
+                ) {
+                    Text(
+                        text = activity.name,
+                        style = TextStyle(
+                            fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 15.sp
+                        )
+                    )
+                    Text(
+                        text = activity.courseName,
+                        style = TextStyle(
+                            fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 12.sp
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "me: What is derivatives",
+                        style = TextStyle(
+                            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 10.sp
+                        ),
+                        color = Color.Gray
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Text(text = "Back to chat", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
-                        Text(text = timeAgo, fontSize = 12.sp, color = Color.Gray)
+                        modifier = Modifier.height(30.dp),
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.Top) {
+//                        TextButton(
+//                            onClick = { /* TODO: Implement back to chat action */ },
+//                            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF7E57C2))
+//                        ) {
+//                            Text("Back to chat", style = TextStyle(
+//                                fontFamily = FontFamily(Font(R.font.montserrat_semi_bold)),
+//                                fontWeight = FontWeight.SemiBold,
+//                                fontSize = 15.sp,
+//                                color = Color.Black,
+//                            ))
+//                        }
+//                        Text(
+//                            text = activity.timeAgo,
+//                            style = TextStyle(
+//                                fontFamily = FontFamily(Font(R.font.montserrat_regular)),
+//                                fontWeight = FontWeight.Normal,
+//                                fontSize = 10.sp,
+//                                color = Color.Black
+//                            ),
+//                            color = Color.Gray,
+//                        )
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    // Circular arrow button
                     Box(
                         modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF6200EE)) // Purple background
-                            .clickable { navController.navigate("chat_screen") }, // add later
+                            .size(28.dp)
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color(0xFF360568),
+                                        Color(0xFF6B0ACE),
+                                    )
+                                ),
+                                shape = CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_right_button),
-                            contentDescription = "Arrow Icon",
+                            painter = painterResource(id = R.drawable.arrow_forward),
+                            contentDescription = "Go back",
                             tint = Color.White,
-                            modifier = Modifier.size(24.dp) // Icon size
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
@@ -540,7 +615,7 @@ fun LessonItem(navController: NavHostController, lesson: Lessonforcourse, course
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "${lesson.id}", style = MaterialTheme.typography.titleMedium)
+            Text(text = "${lesson.id}", fontFamily = FontFamily(Font(R.font.montserrat_regular)),style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(text = lesson.title, style = MaterialTheme.typography.bodyLarge)

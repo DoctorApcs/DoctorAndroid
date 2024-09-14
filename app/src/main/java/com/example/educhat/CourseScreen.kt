@@ -26,6 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 
 @Composable
 fun CourseScreen(navController: NavHostController, courseViewModel: CourseViewModel) {
@@ -96,7 +98,7 @@ fun CreateNewCourseSection(onCreateNewCourse: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_add), // Replace with your plus icon
+                painter = painterResource(id = R.drawable.ic_add),
                 contentDescription = "Add New Course",
                 tint = Color(0xFF6200EE),  // Purple color for the icon
                 modifier = Modifier
@@ -127,7 +129,7 @@ fun CustomAppBar(navController: NavHostController) {
         }
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_back), // Replace with your back icon
+                painter = painterResource(id = R.drawable.ic_back),
                 contentDescription = "Back",
                 tint = Color.Black
             )
@@ -137,6 +139,7 @@ fun CustomAppBar(navController: NavHostController) {
         Text(
             text = "Your Courses",
             style = MaterialTheme.typography.titleLarge,
+            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
             color = Color.Black
         )
     }
@@ -159,21 +162,21 @@ fun CourseItem(navController: NavHostController, course: Course) {
             // Top row with image and title + document count
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    painter = painterResource(id = course.imageResId), // Replace with the actual image resource
+                    painter = painterResource(id = course.imageResId),
                     contentDescription = course.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(64.dp) // Size of the course image
-                        .clip(RoundedCornerShape(8.dp)) // Rounded corners for the image
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(8.dp))
                 )
                 Spacer(modifier = Modifier.width(16.dp))
 
                 // Course Title and Document Count
                 Column {
-                    Text(course.title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                    Text(course.title, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily(Font(R.font.montserrat_regular)),color = Color.Black)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_document), // Replace with your document icon
+                            painter = painterResource(id = R.drawable.ic_document),
                             contentDescription = "Documents",
                             tint = Color.Gray,
                             modifier = Modifier.size(16.dp)
@@ -194,16 +197,17 @@ fun CourseItem(navController: NavHostController, course: Course) {
                     text = "${course.progressPercentage}% Complete",
                     fontSize = 14.sp,
                     color = Color.Gray,
+                    fontFamily = FontFamily(Font(R.font.montserrat_regular)),
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 LinearProgressIndicator(
                     progress = { course.progressPercentage / 100f }, // Progress percentage (0f to 1f)
                     color = Color(0xFF6200EE), // Purple progress bar
-                    trackColor = Color.LightGray, // Background color of the progress bar
+                    trackColor = Color.LightGray,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp)) // Rounded corners for progress bar
+                        .clip(RoundedCornerShape(4.dp))
                 )
             }
 
@@ -216,7 +220,7 @@ fun CourseItem(navController: NavHostController, course: Course) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 // Duration Text
-                Text(course.duration, fontSize = 14.sp, color = Color.Gray)
+                Text(course.duration, fontSize = 14.sp,fontFamily = FontFamily(Font(R.font.montserrat_regular)), color = Color.Gray)
 
                 // View and Learn Buttons
                 Row {
@@ -226,14 +230,14 @@ fun CourseItem(navController: NavHostController, course: Course) {
                         shape = CircleShape,
                         colors = ButtonDefaults.outlinedButtonColors(
                             containerColor = Color(0xFF6200EE), // Purple background
-                            contentColor = Color.White // White text and icon
+                            contentColor = Color.White
                         ),
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
                         Text("View")
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_upload), // Replace with your download icon
+                            painter = painterResource(id = R.drawable.ic_upload),
                             contentDescription = "Download",
                             modifier = Modifier.size(16.dp)
                         )
@@ -241,17 +245,17 @@ fun CourseItem(navController: NavHostController, course: Course) {
 
                     // Learn Button with Play Icon
                     Button(
-                        onClick = { navController.navigate("learn/${course.id}") },
+                        onClick = { navController.navigate("course_detail/${course.id}") },
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF6200EE), // Purple background
-                            contentColor = Color.White // White text and icon
+                            contentColor = Color.White
                         )
                     ) {
-                        Text("Learn")
+                        Text("Learn",fontFamily = FontFamily(Font(R.font.montserrat_regular)))
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_play_arrow), // Replace with your play icon
+                            painter = painterResource(id = R.drawable.ic_play_arrow),
                             contentDescription = "Play",
                             modifier = Modifier.size(16.dp)
                         )

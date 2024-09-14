@@ -34,6 +34,7 @@ fun MyApp(modifier: Modifier = Modifier) {
             composable("home") { HomeScreen(navController = navController, courseViewModel = courseViewModel) }
             composable("analytics") { AnalyticsScreen(navController = navController) }
             composable("welcome") { WelcomeBackScreen(navController = navController) }
+            composable("chat") { AssistantCardsScreen(navController = navController) }
             composable(
                 route = "chat/{assistantId}",
                 arguments = listOf(navArgument("assistantId") { type = NavType.StringType })
@@ -41,7 +42,6 @@ fun MyApp(modifier: Modifier = Modifier) {
                 val assistantId = backStackEntry.arguments?.getString("assistantId") ?: ""
                 ChatScreen(navController, assistantId)
             }
-            composable("chat") { AssistantCardsScreen(navController = navController) }
             composable("courses") { CourseScreen(navController, courseViewModel) }
             composable("course_detail/{courseId}") { backStackEntry ->
                 val courseId = backStackEntry.arguments?.getString("courseId")
