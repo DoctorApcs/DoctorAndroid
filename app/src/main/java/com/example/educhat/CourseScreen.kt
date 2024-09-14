@@ -245,7 +245,7 @@ fun CourseItem(navController: NavHostController, course: Course) {
 
                     // Learn Button with Play Icon
                     Button(
-                        onClick = { navController.navigate("learn/${course.id}") },
+                        onClick = { navController.navigate("course_detail/${course.id}") },
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF6200EE), // Purple background
