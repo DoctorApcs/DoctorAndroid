@@ -56,6 +56,7 @@ fun MyApp(modifier: Modifier = Modifier) {
                 val lessonId = backStackEntry.arguments?.getString("lessonId")?.toIntOrNull() ?: return@composable
                 LessonDetailScreen(navController, courseId, lessonId, courseViewModel)
             }
+            composable("register") { RegisterAccountScreen(navController = navController) }
         }
     }
 }
