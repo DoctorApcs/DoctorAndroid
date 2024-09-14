@@ -24,6 +24,7 @@ import com.aay.compose.barChart.BarChart
 import com.aay.compose.barChart.model.BarParameters
 import com.aay.compose.baseComponents.model.LegendPosition
 import com.example.educhat.R
+import com.example.educhat.ui.theme.CustomPrimaryStart
 
 @Composable
 fun AnalyticsSection(navController: NavController) {
@@ -79,7 +80,7 @@ fun ActivityChart(navController: NavController) {
         BarParameters(
             dataName = "Completed",
             data = listOf(3.6, 10.6, 10.0, 9.6, 8.0, 8.6, 7.0),
-            barColor = Color(0xFF00A3D4)
+            barColor = CustomPrimaryStart
         ),
     )
 
