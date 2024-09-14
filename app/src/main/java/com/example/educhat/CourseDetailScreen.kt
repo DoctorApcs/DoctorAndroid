@@ -43,6 +43,8 @@ import androidx.compose.material3.TabRow
 import androidx.navigation.NavController
 import com.example.educhat.ui.components.home.HomeCourseList
 import androidx.compose.material3.TabRowDefaults
+import com.example.educhat.ui.components.home.Montserrat
+
 @Composable
 fun CourseDetailsScreen(navController: NavHostController, courseId: String, courseViewModel: CourseViewModel) {
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -101,6 +103,7 @@ fun CourseDetailsScreen(navController: NavHostController, courseId: String, cour
                 //style = MaterialTheme.typography.h4,
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.Black,
+                fontFamily = Montserrat,
                 modifier = Modifier.align(Alignment.Center) // Center the title
             )
         }
