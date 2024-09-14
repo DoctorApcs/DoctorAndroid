@@ -33,9 +33,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.educhat.R
 import com.example.educhat.ui.theme.CustomPrimaryStart
+import com.example.educhat.Course
+import androidx.navigation.NavController
 
 @Composable
-fun AddCourseCard(onAddNewCourse: () -> Unit) {
+fun AddCourseCard(navController: NavController,onAddNewCourse: () -> Unit) {
     Box(
         modifier = Modifier
             .width(180.dp)
@@ -55,7 +57,7 @@ fun AddCourseCard(onAddNewCourse: () -> Unit) {
 }
 
 @Composable
-fun CourseCard(course: Course) {
+fun CourseCard(navController: NavController,course: Course) {
     Card(
         modifier = Modifier
             .width(180.dp)
@@ -64,14 +66,17 @@ fun CourseCard(course: Course) {
                 elevation = 4.dp,
                 shape = RoundedCornerShape(25.dp),
                 spotColor = Color.Black.copy(alpha = 0.8f)
-            ),
+            )
+            .clickable {
+                navController.navigate("course_detail/${course.id}")
+            },
         shape = RoundedCornerShape(25.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Background image
             Image(
-                painter = painterResource(id = course.imageRes),
-                contentDescription = "${course.name} background",
+                painter = painterResource(id = course.imageResId),
+                contentDescription = "${course.title} background",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
@@ -100,7 +105,7 @@ fun CourseCard(course: Course) {
                 verticalArrangement = Arrangement.Bottom
             ) {
                 Text(
-                    course.name,
+                    course.title,
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White
                 )
@@ -115,7 +120,7 @@ fun CourseCard(course: Course) {
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
-                        "${course.docCount} Docs",
+                        "${course.documentsCount} Docs",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White
                     )

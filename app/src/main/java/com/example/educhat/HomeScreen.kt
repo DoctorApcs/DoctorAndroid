@@ -27,7 +27,7 @@ import com.example.educhat.ui.components.home.KnowledgeBaseViewModel
 import com.example.educhat.ui.theme.CustomPrimaryStart
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController,courseViewModel: CourseViewModel) {
     var showKnowledgeBaseModal by remember { mutableStateOf(false) }
 
     // Knowledge Base Modal
@@ -59,7 +59,11 @@ fun HomeScreen(navController: NavController) {
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 25.sp
                             ),
-                            modifier = Modifier.padding(vertical = 16.dp)
+                            modifier = Modifier
+                                .padding(vertical = 16.dp)
+                                .clickable {
+                                    navController.navigate("courses")
+                                }
                         )
                         Text(
                             "See all",
@@ -77,7 +81,7 @@ fun HomeScreen(navController: NavController) {
                         )
                     }
                 }
-                item { HomeCourseList(onAddNewCourse = {showKnowledgeBaseModal = true}) }
+                item { HomeCourseList(navController,onAddNewCourse = {showKnowledgeBaseModal = true},courseViewModel) }
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(4.dp),

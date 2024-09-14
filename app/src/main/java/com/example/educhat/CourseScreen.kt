@@ -13,35 +13,96 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
+import androidx.compose.foundation.Canvas
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.PathEffect
 
-//@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CourseScreen(navController: NavHostController, courses: List<Course>) {
-    Column(
+fun CourseScreen(navController: NavHostController, courseViewModel: CourseViewModel) {
+    // Retrieve the courses from the ViewModel
+    val courses = courseViewModel.courses
+
+    var showKnowledgeBaseModal by remember { mutableStateOf(false) }
+
+    if (showKnowledgeBaseModal) {
+        KnowledgeBaseModal(
+            onDismiss = { showKnowledgeBaseModal = false },
+        )
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(16.dp)
+        ) {
+            // Custom app bar with back button and title
+            CustomAppBar(navController)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // New Course Creation Section
+            CreateNewCourseSection(onCreateNewCourse = {
+                // Handle new course creation logic here
+                showKnowledgeBaseModal = true
+            })
+
+            // LazyColumn to display courses
+            LazyColumn(
+                contentPadding = PaddingValues(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(courses) { course ->
+                    CourseItem(navController, course)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CreateNewCourseSection(onCreateNewCourse: () -> Unit) {
+    Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
+            .fillMaxWidth()
+            .height(120.dp)  // Height for the dashed box
+            .clickable { onCreateNewCourse() }  // Make it clickable for course creation
             .padding(16.dp)
     ) {
-        // Custom app bar with back button and title
-        CustomAppBar(navController)
+        Canvas(modifier = Modifier.matchParentSize()) {
+            drawRoundRect(
+                color = Color(0xFF6200EE),  // Purple color for the dashed border
+                style = Stroke(
+                    width = 2.dp.toPx(),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+                ),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(16.dp.toPx())
+            )
+        }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // LazyColumn to display courses
-        LazyColumn(
-            contentPadding = PaddingValues(vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        // Plus icon in the center
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(courses) { course ->
-                CourseItem(navController, course)
-            }
+            Icon(
+                painter = painterResource(id = R.drawable.ic_add), // Replace with your plus icon
+                contentDescription = "Add New Course",
+                tint = Color(0xFF6200EE),  // Purple color for the icon
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)  // Rounded plus button
+            )
         }
     }
 }
@@ -57,7 +118,14 @@ fun CustomAppBar(navController: NavHostController) {
         horizontalArrangement = Arrangement.Start
     ) {
         // Back button
-        IconButton(onClick = { navController.popBackStack() }) {
+        IconButton(onClick = {
+            navController.navigate("home") {
+                popUpTo(navController.graph.startDestinationId) {
+                    inclusive = true
+                }
+            }
+        }
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_back), // Replace with your back icon
                 contentDescription = "Back",

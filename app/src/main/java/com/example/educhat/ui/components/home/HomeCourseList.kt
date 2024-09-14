@@ -12,26 +12,25 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
+import com.example.educhat.CourseViewModel
+import androidx.navigation.NavController
 
-data class Course(val name: String, val imageRes: Int, val docCount: Int)
+
+//data class Course(val name: String, val imageRes: Int, val docCount: Int)
 
 @Composable
-fun HomeCourseList(onAddNewCourse: () -> Unit) {
-    val courses = listOf(
-        Course("Calculus 3", R.drawable.calculus_bg, 2),
-        Course("CS305", R.drawable.cs_bg, 10),
-        Course("CS302", R.drawable.cs_bg, 22),
-    )
+fun HomeCourseList(navController: NavController,onAddNewCourse: () -> Unit,courseViewModel: CourseViewModel) {
 
+    val courses = courseViewModel.courses
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
     ) {
-        item{ AddCourseCard(onAddNewCourse) }
+        item{ AddCourseCard(navController,onAddNewCourse) }
 
         items(courses) { course ->
-            CourseCard(course)
+            CourseCard(navController,course)
         }
     }
 }
