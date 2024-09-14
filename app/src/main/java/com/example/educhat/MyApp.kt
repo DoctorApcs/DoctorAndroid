@@ -29,6 +29,7 @@ fun MyApp(modifier: Modifier = Modifier) {
             composable("home") { HomeScreen(navController = navController) }
             composable("analytics") { AnalyticsScreen(navController = navController) }
             composable("welcome") { WelcomeBackScreen(navController = navController) }
+            composable("register") { RegisterAccountScreen(navController = navController) }
         }
     }
 }
