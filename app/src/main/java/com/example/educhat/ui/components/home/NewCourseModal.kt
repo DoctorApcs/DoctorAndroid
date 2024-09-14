@@ -48,10 +48,10 @@ val Montserrat = FontFamily(
 
 class KnowledgeBaseViewModel : ViewModel() {
     private var webSocket: WebSocket? = null
-    private val client = OkHttpClient.Builder()
-        .readTimeout(30, TimeUnit.SECONDS)
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .build()
+        private val client = OkHttpClient.Builder()
+                .readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .build()
 
     var query by mutableStateOf("")
     var maxSections by mutableStateOf("3")
@@ -62,7 +62,7 @@ class KnowledgeBaseViewModel : ViewModel() {
     var sections by mutableStateOf(listOf<String>())
     var isLoading by mutableStateOf(false)
     var logs by mutableStateOf("")
-    var isHumanFeedbackRequired by mutableStateOf(false)
+var isHumanFeedbackRequired by mutableStateOf(false)
     var feedbackText by mutableStateOf("")
     var isCompleted by mutableStateOf(false)
     var sources by mutableStateOf(listOf<String>())

@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.educhat.ui.theme.EduChatTheme
+import androidx.activity.viewModels
 
 // structure code:
 // MainActivity calls MyApp

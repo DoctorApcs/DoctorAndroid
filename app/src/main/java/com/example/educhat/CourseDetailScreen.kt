@@ -1,6 +1,7 @@
 package com.example.educhat
 
-import android.content.Intent
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,13 +38,24 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.window.Dialog
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.navigation.NavController
+import com.example.educhat.ui.components.home.HomeCourseList
+import androidx.compose.material3.TabRowDefaults
 @Composable
-fun CourseDetailsScreen(navController: NavHostController, courseId: String, courses: List<Course>) {
+fun CourseDetailsScreen(navController: NavHostController, courseId: String, courseViewModel: CourseViewModel) {
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("Dashboard", "Uploads", "Conversations")
 
-    val course = courses.find { it.id == courseId }
+    val course = courseViewModel.getCourseById(courseId)
+    var showKnowledgeBaseModal by remember { mutableStateOf(false) }
 
+    // If the course is null, display a fallback message or screen
+    if (course == null) {
+        Text("Course not found", style = MaterialTheme.typography.bodyLarge)
+        return
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +68,7 @@ fun CourseDetailsScreen(navController: NavHostController, courseId: String, cour
                 .height(200.dp) // Adjust the height as per your design
         ) {
             Image(
-                painter = painterResource(id = R.drawable.default_background), // Replace with your actual image resource
+                painter = painterResource(id = course.imageResId), // Replace with your actual image resource
                 contentDescription = "Course Background",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -95,18 +107,56 @@ fun CourseDetailsScreen(navController: NavHostController, courseId: String, cour
         //Spacer(modifier = Modifier.height(4.dp))
 
         // Tabs and content section below the background
-        TabRow(selectedTabIndex = selectedTab) {
+//        TabRow(selectedTabIndex = selectedTab) {
+//            tabs.forEachIndexed { index, title ->
+//                Tab(
+//                    text = { Text(title) },
+//                    selected = selectedTab == index,
+//                    onClick = { selectedTab = index }
+//                )
+//            }
+//        }
+// Tabs with custom text styling for highlight
+        // Custom Tabs
+        // Custom Tabs
+        TabRow(
+            selectedTabIndex = selectedTab,
+            containerColor = Color.White, // Background color for TabRow
+            contentColor = Color.Black
+        ) {
             tabs.forEachIndexed { index, title ->
                 Tab(
-                    text = { Text(title) },
                     selected = selectedTab == index,
-                    onClick = { selectedTab = index }
+                    onClick = { selectedTab = index },
+                    text = {
+                        Text(
+                            text = title,
+                            color = if (selectedTab == index) Color.White else Color.Black,
+                            fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                    },
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .let {
+                            if (selectedTab == index) {
+                                it.background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(Color(0xFF9C27B0), Color(0xFF673AB7))
+                                    ),
+                                    shape = RoundedCornerShape(16.dp)
+                                )
+                            } else {
+                                it
+                            }
+                        }
                 )
             }
         }
 
         when (selectedTab) {
-            0 -> course?.let { DashboardContent(course = it) } // Pass the course object to DashboardContent
+            0 -> course?.let { DashboardContent(course = it,navController) } // Pass the course object to DashboardContent
             1 -> course?.let { UploadsContent() }   // Assuming you'll pass course data to UploadsContent
             2 -> course?.let { ConversationsContent(navController) } // Assuming the same for ConversationsContent
         }
@@ -114,13 +164,26 @@ fun CourseDetailsScreen(navController: NavHostController, courseId: String, cour
 }
 
 @Composable
-fun DashboardContent(course: Course) {
+fun DashboardContent(course: Course,navController:NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(top = 16.dp)
     ) {
+        // Lessons Section
+        Text(
+            text = "Lessons",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(16.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // List of Lessons
+        val lessons = course.lessons
+        LessonList(navController = navController, lessons = lessons, courseId = course.id)
+
+        Spacer(modifier = Modifier.height(32.dp))
         // Dashboard for the course
         Text("Bar Chart:", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(16.dp))
@@ -442,3 +505,52 @@ fun PieChartComposable(pieChartData: List<PieChartData>) {
             .height(200.dp)
     )
 }
+
+
+@Composable
+fun LessonList(navController: NavHostController, lessons: List<Lessonforcourse>, courseId: String) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(16.dp)
+    ) {
+        lessons.forEach { lesson ->
+            LessonItem(navController, lesson, courseId) // Pass the navController and courseId
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
+
+@Composable
+fun LessonItem(navController: NavHostController, lesson: Lessonforcourse, courseId: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .clickable {
+                navController.navigate("lessonDetail/${courseId}/${lesson.id}")
+            },
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "${lesson.id}", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(text = lesson.title, style = MaterialTheme.typography.bodyLarge)
+                Text(text = lesson.description, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "Go to Lesson",
+                tint = Color.Gray
+            )
+        }
+    }
+}
+
+data class Lesson(val number: Int, val title: String, val description: String)
